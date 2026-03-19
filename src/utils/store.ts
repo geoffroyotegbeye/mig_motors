@@ -68,6 +68,7 @@ const defaultMarques: Marque[] = [
   { id: '5', nom: 'PIAGGIO', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Piaggio_logo.svg/800px-Piaggio_logo.svg.png', type: 'Deux-roues', description: 'Mobilité urbaine élégante à l\'italienne.', createdAt: new Date().toISOString() },
   { id: '6', nom: 'KAIYI', logo: 'https://www.kaiyiauto.com/img/logo.png', type: 'Berlines & SUV', description: 'L\'avenir de l\'automobile chinoise.', createdAt: new Date().toISOString() },
   { id: '7', nom: 'ASHOK LEYLAND', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Ashok_Leyland_logo.svg/800px-Ashok_Leyland_logo.svg.png', type: 'Poids lourds & Bus', description: 'Solutions de transport fiables.', createdAt: new Date().toISOString() },
+  { id: '8', nom: 'JEEP', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Ashok_Leyland_logo.svg/800px-Ashok_Leyland_logo.svg.png', type: 'SUV', description: ' transport confortable.', createdAt: new Date().toISOString() },
 ];
 
 const defaultVehicules: Vehicule[] = [
@@ -75,6 +76,7 @@ const defaultVehicules: Vehicule[] = [
   { id: '2', marqueId: '1', nom: 'KIA Picanto', prix: '9 200 000', annee: '2024', carburant: 'Essence', transmission: 'Manuelle', couleur: 'Rouge', description: 'Citadine économique et agile.', image: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&q=80', statut: 'disponible', createdAt: new Date().toISOString() },
   { id: '3', marqueId: '2', nom: 'Mercedes Classe C', prix: '45 000 000', annee: '2023', carburant: 'Diesel', transmission: 'Automatique', couleur: 'Noir', description: 'Berline de luxe par excellence.', image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80', statut: 'disponible', createdAt: new Date().toISOString() },
   { id: '4', marqueId: '3', nom: 'Fiat 500', prix: '8 900 000', annee: '2023', carburant: 'Essence', transmission: 'Automatique', couleur: 'Bleu', description: 'Icône du style italien.', image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800&q=80', statut: 'réservé', createdAt: new Date().toISOString() },
+  { id: '5', marqueId: '8', nom: 'JEEP 500', prix: '8 900 000', annee: '2023', carburant: 'Essence', transmission: 'Automatique', couleur: 'Bleu', description: 'Icône du style italien.', image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800&q=80', statut: 'réservé', createdAt: new Date().toISOString() },
 ];
 
 // --- Marques ---

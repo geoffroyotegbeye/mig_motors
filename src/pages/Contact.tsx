@@ -31,7 +31,7 @@ const Contact = () => {
     { icon: Clock, title: 'Horaires', details: ['Lun - Ven: 8h00 - 18h00', 'Samedi: 8h00 - 13h00'] },
   ];
 
-  const brands = ['KIA', 'KAIYI', 'PIAGGIO', 'MERCEDES', 'FUSO', 'ASHOK LEYLAND', 'FIAT'];
+  const brands = ['KIA', 'KAIYI', 'PIAGGIO', 'MERCEDES', 'FUSO', 'ASHOK LEYLAND', 'FIAT' ,'JEEP'];
 
   const inputClass = "w-full bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl py-4 pl-12 pr-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-300 outline-none";
 

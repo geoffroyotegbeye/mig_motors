@@ -19,10 +19,11 @@ const Home = () => {
   const gammes = [
     { icon: Car, label: 'Berlines & SUV', desc: 'KIA, KAIYI' },
     { icon: Crown, label: 'Luxe & Premium', desc: 'Mercedes' },
-    { icon: Bike, label: 'Deux-roues', desc: 'Piaggio' },
+    { icon: Bike, label: 'Le meilleur', desc: 'Piaggio' },
     { icon: Truck, label: 'Camions', desc: 'FUSO' },
     { icon: Building2, label: 'Poids lourds & Bus', desc: 'Ashok Leyland' },
     { icon: Package, label: 'Citadines', desc: 'FIAT' },
+    { icon: Package, label: 'Suv', desc: 'JEEP' },
   ];
 
   return (
@@ -32,7 +33,7 @@ const Home = () => {
       <section ref={heroRef} className="relative h-screen overflow-hidden">
         <motion.div style={{ y: heroY }} className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
-          <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 opacity-100">
             <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&q=80" alt="Luxury car" className="w-full h-full object-cover" />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -116,7 +117,8 @@ const Home = () => {
                 initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
                 transition={{ delay: index * 0.1, type: 'spring', bounce: 0.4 }} whileHover={{ y: -8 }}>
                 <Link to="/marques" className="flex flex-col items-center group">
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-900 border-2 border-gray-200 dark:border-zinc-700 group-hover:border-red-500 dark:group-hover:border-red-600/50 flex items-center justify-center transition-all duration-500 relative shadow-sm dark:shadow-none">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-900 border-2 border-gray-200 dark:border-zinc-700 
+                  group-hover:border-red-500 dark:group-hover:border-red-600/50 flex items-center justify-center transition-all duration-500 relative shadow-sm dark:shadow-none">
                     <div className="absolute inset-0 rounded-full bg-red-600/0 group-hover:bg-red-600/5 dark:group-hover:bg-red-600/10 transition-all duration-500" />
                     <gamme.icon className="w-7 h-7 sm:w-10 sm:h-10 text-gray-400 group-hover:text-red-500 transition-colors duration-300" />
                   </div>

@@ -62,7 +62,7 @@ const Footer = () => {
               <span className="w-8 h-0.5 bg-red-600 mr-3" />Nos Marques
             </h4>
             <ul className="space-y-3">
-              {['KIA', 'KAIYI', 'PIAGGIO', 'MERCEDES', 'FUSO', 'ASHOK LEYLAND', 'FIAT'].map((brand, index) => (
+              {['KIA', 'KAIYI', 'PIAGGIO', 'MERCEDES', 'FUSO', 'ASHOK LEYLAND', 'FIAT', 'JEEP'].map((brand, index) => (
                 <li key={index}>
                   <Link to="/marques" className="text-gray-400 hover:text-red-400 transition-colors duration-300 flex items-center group">
                     <span className="w-0 group-hover:w-4 h-0.5 bg-red-600 mr-0 group-hover:mr-2 transition-all duration-300" />
