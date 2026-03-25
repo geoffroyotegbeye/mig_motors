@@ -1,12 +1,20 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Car, CheckCircle, Mail, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getMarques, getVehicules, getMessages } from '../../utils/store';
+import { getMarques, getVehicules, getMessages, type Marque, type Vehicule, type ContactMessage } from '../../utils/api';
 
 const Dashboard = () => {
-  const marques = getMarques();
-  const vehicules = getVehicules();
-  const messages = getMessages();
+  const [marques, setMarques] = useState<Marque[]>([]);
+  const [vehicules, setVehicules] = useState<Vehicule[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+
+  useEffect(() => {
+    getMarques().then(setMarques);
+    getVehicules().then(setVehicules);
+    getMessages().then(setMessages);
+  }, []);
+
   const unreadMessages = messages.filter(m => !m.read).length;
 
   const stats = [
@@ -72,7 +80,7 @@ const Dashboard = () => {
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${
                     v.statut === 'disponible' ? 'bg-green-600/20 text-green-400' :
-                    v.statut === 'réservé' ? 'bg-yellow-600/20 text-yellow-400' :
+                    v.statut === 'reserve' ? 'bg-yellow-600/20 text-yellow-400' :
                     'bg-gray-600/20 text-gray-400'
                   }`}>{v.statut}</span>
                 </div>

@@ -1,25 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Trash2, Eye, X, Phone, User, Tag, MessageSquare, Clock } from 'lucide-react';
-import { getMessages, markAsRead, deleteMessage, type ContactMessage } from '../../utils/store';
+import { getMessages, markAsRead, deleteMessage, type ContactMessage } from '../../utils/api';
 
 const AdminMessages = () => {
-  const [messages, setMessages] = useState<ContactMessage[]>(getMessages);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [selected, setSelected] = useState<ContactMessage | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
-  const refresh = () => setMessages(getMessages());
+  const refresh = () => getMessages().then(setMessages);
 
-  const handleOpen = (msg: ContactMessage) => {
+  useEffect(() => { refresh(); }, []);
+
+  const handleOpen = async (msg: ContactMessage) => {
     if (!msg.read) {
-      markAsRead(msg.id);
+      await markAsRead(msg.id);
       refresh();
     }
     setSelected(msg);
   };
 
-  const handleDelete = (id: string) => {
-    deleteMessage(id);
+  const handleDelete = async (id: number) => {
+    await deleteMessage(id);
     refresh();
     setDeleteConfirm(null);
     if (selected?.id === id) setSelected(null);

@@ -12,19 +12,17 @@ const AdminLogin = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setTimeout(() => {
-      const ok = login(form.username, form.password);
-      if (ok) {
-        navigate('/admin/dashboard');
-      } else {
-        setError('Identifiants incorrects. Réessayez.');
-      }
-      setLoading(false);
-    }, 800);
+    const ok = await login(form.username, form.password);
+    if (ok) {
+      navigate('/admin/dashboard');
+    } else {
+      setError('Identifiants incorrects. Réessayez.');
+    }
+    setLoading(false);
   };
 
   return (

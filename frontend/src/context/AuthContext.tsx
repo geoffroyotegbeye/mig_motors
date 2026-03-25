@@ -1,37 +1,38 @@
 import { createContext, useContext, useState } from 'react';
+import { login as apiLogin } from '../utils/api';
 
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'mig2024';
-const AUTH_KEY = 'mig_admin_auth';
+const TOKEN_KEY = 'mig_token';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (user: string, pass: string) => boolean;
+  login: (user: string, pass: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  login: () => false,
+  login: async () => false,
   logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem(AUTH_KEY) === 'true';
+    return !!localStorage.getItem(TOKEN_KEY);
   });
 
-  const login = (user: string, pass: string) => {
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-      localStorage.setItem(AUTH_KEY, 'true');
+  const login = async (user: string, pass: string): Promise<boolean> => {
+    try {
+      const token = await apiLogin(user, pass);
+      localStorage.setItem(TOKEN_KEY, token);
       setIsAuthenticated(true);
       return true;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
-    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     setIsAuthenticated(false);
   };
 

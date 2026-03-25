@@ -1,49 +1,51 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Pencil, Trash2, X, Upload, Tag } from 'lucide-react';
-import { getMarques, addMarque, updateMarque, deleteMarque, type Marque } from '../../utils/store';
+import { getMarques, addMarque, updateMarque, deleteMarque, uploadImage, type Marque } from '../../utils/api';
 
 const TYPES = ['Berlines & SUV', 'Luxe & Premium', 'Deux-roues', 'Camions & Utilitaires', 'Poids lourds & Bus', 'Citadines'];
 
 const emptyForm = { nom: '', logo: '', type: TYPES[0], description: '' };
 
 const AdminMarques = () => {
-  const [marques, setMarques] = useState<Marque[]>(getMarques);
+  const [marques, setMarques] = useState<Marque[]>([]);
   const [modal, setModal] = useState(false);
   const [editing, setEditing] = useState<Marque | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const refresh = () => setMarques(getMarques());
-
-  const openAdd = () => { setEditing(null); setForm(emptyForm); setPreview(''); setModal(true); };
-  const openEdit = (m: Marque) => { setEditing(m); setForm({ nom: m.nom, logo: m.logo, type: m.type, description: m.description }); setPreview(''); setModal(true); };
-
   const [preview, setPreview] = useState('');
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const refresh = () => getMarques().then(setMarques);
+
+  useEffect(() => { refresh(); }, []);
+
+  const openAdd = () => { setEditing(null); setForm(emptyForm); setPreview(''); setModal(true); };
+  const openEdit = (m: Marque) => { setEditing(m); setForm({ nom: m.nom, logo: m.logo || '', type: m.type, description: m.description || '' }); setPreview(''); setModal(true); };
+
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPreview(URL.createObjectURL(file));
-    setForm(f => ({ ...f, logo: `/marques/${file.name}` }));
+    const url = await uploadImage(file);
+    setForm(f => ({ ...f, logo: url }));
   };
 
   const logoDisplay = preview || form.logo;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editing) {
-      updateMarque(editing.id, form);
+      await updateMarque(editing.id, form);
     } else {
-      addMarque(form);
+      await addMarque(form);
     }
     refresh();
     setModal(false);
   };
 
-  const handleDelete = (id: string) => {
-    deleteMarque(id);
+  const handleDelete = async (id: number) => {
+    await deleteMarque(id);
     refresh();
     setDeleteConfirm(null);
   };
@@ -127,14 +129,8 @@ const AdminMarques = () => {
                         <Upload className="w-4 h-4" /> Uploader une image
                       </button>
                       <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                      {form.logo.startsWith('/marques/') && (
-                        <p className="text-yellow-500 text-xs mt-1.5 text-center">
-                          ⚠️ Place le fichier dans <code className="bg-zinc-700 px-1 rounded">public/marques/</code>
-                        </p>
-                      )}
-                      <p className="text-gray-600 text-xs mt-1 text-center">ou</p>
                       <input type="text" value={form.logo} onChange={e => { setPreview(''); setForm({ ...form, logo: e.target.value }); }}
-                        placeholder="URL ou chemin ex: /marques/kia.png"
+                        placeholder="ou coller une URL"
                         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-2 px-3 text-white text-sm placeholder-gray-500 focus:border-red-500 outline-none transition-all" />
                     </div>
                   </div>

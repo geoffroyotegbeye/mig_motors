@@ -1,20 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Car, Fuel, Settings, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getVehicules, getMarques } from '../utils/store';
+import { getVehicules, getMarques, type Vehicule, type Marque } from '../utils/api';
 
 const Vehicules = () => {
-  const vehicules = getVehicules().filter(v => v.statut !== 'vendu');
-  const marques = getMarques();
+  const [vehicules, setVehicules] = useState<Vehicule[]>([]);
+  const [marques, setMarques] = useState<Marque[]>([]);
   const [search, setSearch] = useState('');
   const [filterMarque, setFilterMarque] = useState('');
   const [filterCarburant, setFilterCarburant] = useState('');
 
+  useEffect(() => {
+    getVehicules().then(data => setVehicules(data.filter(v => v.statut !== 'vendu')));
+    getMarques().then(setMarques);
+  }, []);
+
   const filtered = vehicules.filter(v => {
     const marque = marques.find(m => m.id === v.marqueId);
     const matchSearch = v.nom.toLowerCase().includes(search.toLowerCase()) || marque?.nom.toLowerCase().includes(search.toLowerCase());
-    const matchMarque = filterMarque ? v.marqueId === filterMarque : true;
+    const matchMarque = filterMarque ? v.marqueId === parseInt(filterMarque) : true;
     const matchCarburant = filterCarburant ? v.carburant === filterCarburant : true;
     return matchSearch && matchMarque && matchCarburant;
   });

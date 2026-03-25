@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Clock, Wrench, Shield, CheckCircle, ArrowRight } from 'lucide-react';
+import { MapPin, Phone, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Workshop {
@@ -27,11 +27,6 @@ const Workshop = () => {
   // *******
  
 
-  const services = [
-    { icon: Wrench, title: 'Entretien Préventif', description: 'Vidange, filtres, courroies, freins - tout pour maintenir votre véhicule en parfait état.' },
-    { icon: Shield, title: 'Garantie Constructeur', description: 'Interventions effectuées selon les normes constructeur pour préserver votre garantie.' },
-    { icon: CheckCircle, title: 'Pièces Authentiques', description: 'Utilisation exclusive de pièces d\'origine pour une qualité optimale.' },
-  ];
 
   return (
     <div className="min-h-screen pt-24 pb-20" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -165,14 +160,14 @@ const Workshop = () => {
                         <MapPin className="w-5 h-5 text-red-500" />
                         <span className="text-white font-semibold text-lg">{workshop.city}, {workshop.country}</span>
                       </div>
-                      <p className="text-gray-300 text-sm"><p className="text-gray-400 dark:text-gray-300 text-sm mb-3">Services disponibles</p>
+                      <p className="text-gray-300 text-sm">Services disponibles</p>
                       <div className="flex flex-wrap gap-2">
                         {workshop.services.map((service, idx) => (
                           <span key={idx} className="px-3 py-1 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-full text-gray-700 dark:text-gray-300 text-sm">
                             {service}
                           </span>
                         ))}
-                      </div></p>
+                      </div>
                     </div>
                     {/* <motion.div initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.5 }}
                       className="absolute top-6 right-6 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 rounded-full text-white text-sm font-medium shadow-lg">

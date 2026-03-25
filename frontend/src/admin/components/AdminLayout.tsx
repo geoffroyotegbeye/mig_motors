@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Car, Tag, LogOut, Menu, X, Mail } from 'lucide-react';
+import { LayoutDashboard, Car, Tag, LogOut, Menu, Mail } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getMessages } from '../../utils/store';
+import { getMessages } from '../../utils/api';
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const unreadCount = getMessages().filter(m => !m.read).length;
+  useEffect(() => {
+    getMessages().then(msgs => setUnreadCount(msgs.filter(m => !m.read).length));
+  }, [location.pathname]);
 
   const navItems = [
     { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', badge: 0 },

@@ -1,69 +1,81 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Pencil, Trash2, X, Upload, Car, Search } from 'lucide-react';
-import { getVehicules, addVehicule, updateVehicule, deleteVehicule, getMarques, type Vehicule } from '../../utils/store';
+import { getVehicules, addVehicule, updateVehicule, deleteVehicule, getMarques, uploadImage, type Vehicule, type Marque } from '../../utils/api';
 
 const CARBURANTS = ['Essence', 'Diesel', 'Hybride', 'Électrique', 'GPL'];
 const TRANSMISSIONS = ['Manuelle', 'Automatique'];
-const STATUTS = ['disponible', 'réservé', 'vendu'] as const;
+const STATUTS = ['disponible', 'reserve', 'vendu'] as const;
 
-const emptyForm = {
-  marqueId: '', nom: '', prix: '', annee: new Date().getFullYear().toString(),
+const emptyForm: {
+  marqueId: number; nom: string; prix: string; annee: string;
+  carburant: string; transmission: string; couleur: string;
+  description: string; image: string; statut: 'disponible' | 'vendu' | 'reserve';
+} = {
+  marqueId: 0, nom: '', prix: '', annee: new Date().getFullYear().toString(),
   carburant: CARBURANTS[0], transmission: TRANSMISSIONS[0],
-  couleur: '', description: '', image: '', statut: 'disponible' as const,
+  couleur: '', description: '', image: '', statut: 'disponible',
 };
 
 const AdminVehicules = () => {
-  const marques = getMarques();
-  const [vehicules, setVehicules] = useState<Vehicule[]>(getVehicules);
+  const [marques, setMarques] = useState<Marque[]>([]);
+  const [vehicules, setVehicules] = useState<Vehicule[]>([]);
   const [modal, setModal] = useState(false);
   const [editing, setEditing] = useState<Vehicule | null>(null);
-  const [form, setForm] = useState({ ...emptyForm, marqueId: marques[0]?.id || '' });
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [form, setForm] = useState({ ...emptyForm });
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [filterMarque, setFilterMarque] = useState('');
+  const [preview, setPreview] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const refresh = () => setVehicules(getVehicules());
+  const refresh = () => getVehicules().then(setVehicules);
+
+  useEffect(() => {
+    getMarques().then(data => {
+      setMarques(data);
+      setForm(f => ({ ...f, marqueId: data[0]?.id || 0 }));
+    });
+    refresh();
+  }, []);
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ ...emptyForm, marqueId: marques[0]?.id || '' });
+    setForm({ ...emptyForm, marqueId: marques[0]?.id || 0 });
     setPreview('');
     setModal(true);
   };
 
   const openEdit = (v: Vehicule) => {
     setEditing(v);
-    setForm({ marqueId: v.marqueId, nom: v.nom, prix: v.prix, annee: v.annee, carburant: v.carburant, transmission: v.transmission, couleur: v.couleur, description: v.description, image: v.image, statut: v.statut });
+    setForm({ marqueId: v.marqueId, nom: v.nom, prix: v.prix, annee: v.annee, carburant: v.carburant, transmission: v.transmission, couleur: v.couleur || '', description: v.description || '', image: v.image || '', statut: v.statut });
     setPreview('');
     setModal(true);
   };
 
-  const [preview, setPreview] = useState('');
-
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPreview(URL.createObjectURL(file));
-    setForm(f => ({ ...f, image: `/vehicules/${file.name}` }));
+    const url = await uploadImage(file);
+    setForm(f => ({ ...f, image: url }));
   };
 
   const imageDisplay = preview || form.image;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editing) {
-      updateVehicule(editing.id, form);
+      await updateVehicule(editing.id, form);
     } else {
-      addVehicule(form);
+      await addVehicule(form);
     }
     refresh();
     setModal(false);
   };
 
-  const handleDelete = (id: string) => {
-    deleteVehicule(id);
+  const handleDelete = async (id: number) => {
+    await deleteVehicule(id);
     refresh();
     setDeleteConfirm(null);
   };
@@ -71,7 +83,7 @@ const AdminVehicules = () => {
   const filtered = vehicules.filter(v => {
     const marque = marques.find(m => m.id === v.marqueId);
     const matchSearch = v.nom.toLowerCase().includes(search.toLowerCase()) || marque?.nom.toLowerCase().includes(search.toLowerCase());
-    const matchMarque = filterMarque ? v.marqueId === filterMarque : true;
+    const matchMarque = filterMarque ? v.marqueId === parseInt(filterMarque) : true;
     return matchSearch && matchMarque;
   });
 
@@ -147,7 +159,7 @@ const AdminVehicules = () => {
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                         v.statut === 'disponible' ? 'bg-green-600/20 text-green-400' :
-                        v.statut === 'réservé' ? 'bg-yellow-600/20 text-yellow-400' :
+                        v.statut === 'reserve' ? 'bg-yellow-600/20 text-yellow-400' :
                         'bg-gray-600/20 text-gray-400'
                       }`}>{v.statut}</span>
                     </td>
@@ -205,13 +217,8 @@ const AdminVehicules = () => {
                         <Upload className="w-4 h-4" /> Uploader une photo
                       </button>
                       <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                      {form.image.startsWith('/vehicules/') && (
-                        <p className="text-yellow-500 text-xs text-center">
-                          ⚠️ Place le fichier dans <code className="bg-zinc-700 px-1 rounded">public/vehicules/</code>
-                        </p>
-                      )}
                       <input type="text" value={form.image} onChange={e => { setPreview(''); setForm({ ...form, image: e.target.value }); }}
-                        placeholder="URL ou chemin ex: /vehicules/kia.jpg"
+                        placeholder="ou coller une URL"
                         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-2 px-3 text-white text-sm placeholder-gray-500 focus:border-red-500 outline-none transition-all" />
                     </div>
                   </div>
@@ -221,7 +228,7 @@ const AdminVehicules = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-gray-400 text-sm mb-2">Marque *</label>
-                    <select value={form.marqueId} onChange={e => setForm({ ...form, marqueId: e.target.value })} required
+                    <select value={form.marqueId} onChange={e => setForm({ ...form, marqueId: parseInt(e.target.value) })} required
                       className={inputClass + ' appearance-none cursor-pointer'}>
                       {marques.map(m => <option key={m.id} value={m.id}>{m.nom}</option>)}
                     </select>
@@ -281,7 +288,7 @@ const AdminVehicules = () => {
                         className={`flex-1 py-2.5 rounded-xl text-sm font-medium capitalize transition-all border ${
                           form.statut === s
                             ? s === 'disponible' ? 'bg-green-600/20 border-green-600/50 text-green-400'
-                              : s === 'réservé' ? 'bg-yellow-600/20 border-yellow-600/50 text-yellow-400'
+                              : s === 'reserve' ? 'bg-yellow-600/20 border-yellow-600/50 text-yellow-400'
                               : 'bg-gray-600/20 border-gray-600/50 text-gray-400'
                             : 'bg-zinc-800 border-zinc-700 text-gray-500 hover:border-zinc-600'
                         }`}>

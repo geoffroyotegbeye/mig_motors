@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Car, Truck, Bike, Fuel, Settings } from 'lucide-react';
-import { getMarques, getVehicules, type Marque } from '../utils/store';
+import { getMarques, getVehicules, type Marque, type Vehicule } from '../utils/api';
 
 const Brands = () => {
   const [selectedBrand, setSelectedBrand] = useState<Marque | null>(null);
-  const brands = getMarques();
-  const allVehicules = getVehicules();
+  const [brands, setBrands] = useState<Marque[]>([]);
+  const [allVehicules, setAllVehicules] = useState<Vehicule[]>([]);
+
+  useEffect(() => {
+    getMarques().then(setBrands);
+    getVehicules().then(setAllVehicules);
+  }, []);
 
   const getIcon = (type: string) => {
     if (type.includes('Camions') || type.includes('Poids')) return Truck;
@@ -14,7 +19,7 @@ const Brands = () => {
     return Car;
   };
 
-  const getBrandVehicules = (marqueId: string) =>
+  const getBrandVehicules = (marqueId: number) =>
     allVehicules.filter(v => v.marqueId === marqueId && v.statut !== 'vendu');
 
   return (
