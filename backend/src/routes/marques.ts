@@ -9,7 +9,8 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
     const marques = await prisma.marque.findMany({ orderBy: { createdAt: 'asc' } });
     res.json(marques);
-  } catch {
+  } catch (e) {
+    console.error('GET /marques error:', e);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });

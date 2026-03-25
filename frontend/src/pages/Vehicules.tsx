@@ -104,7 +104,7 @@ const Vehicules = () => {
                       </div>
                       {marque?.logo && (
                         <div className="absolute top-3 right-3 w-8 h-8 bg-white dark:bg-zinc-800 rounded-lg p-1 flex items-center justify-center">
-                          <img src={marque.logo} alt={marque.nom} className="w-full h-full object-contain filter brightness-0 dark:invert" />
+                          <img src={marque.logo} alt={marque.nom} className="w-full h-full object-contain" />
                         </div>
                       )}
                     </div>
@@ -130,7 +130,8 @@ const Vehicules = () => {
                       </div>
 
                       <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-zinc-800">
-                        <p className="text-gray-900 dark:text-white font-bold text-sm">À partir de {v.prix} <span className="text-xs font-normal text-gray-400">FCFA</span></p>
+                        <p className="text-gray-400 text-xs">À partir de</p>
+                        <p className="text-gray-900 dark:text-white font-bold text-sm">{v.prix} <span className="text-xs font-normal text-gray-400">FCFA</span></p>
                         <Link to="/contact"
                           className="px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-semibold rounded-lg hover:shadow-md hover:shadow-red-600/30 transition-all">
                           Contacter

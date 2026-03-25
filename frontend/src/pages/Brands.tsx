@@ -68,7 +68,7 @@ const Brands = () => {
                       <div className="w-16 h-16 md:w-20 md:h-20 mb-2 flex items-center justify-center">
                         {brand.logo ? (
                           <img src={brand.logo} alt={brand.nom}
-                            className="max-w-full max-h-full object-contain filter brightness-0 dark:invert opacity-70 group-hover:opacity-100 transition-opacity"
+                            className="max-w-full max-h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity"
                             onError={e => { e.currentTarget.style.display = 'none'; }} />
                         ) : (
                           <Icon className="w-12 h-12 text-gray-400" />
@@ -119,7 +119,7 @@ const Brands = () => {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
                     <div className="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-2xl p-3 flex items-center justify-center flex-shrink-0">
                       {selectedBrand.logo
-                        ? <img src={selectedBrand.logo} alt={selectedBrand.nom} className="w-full h-full object-contain filter brightness-0 dark:invert" />
+                        ? <img src={selectedBrand.logo} alt={selectedBrand.nom} className="w-full h-full object-contain" />
                         : <Icon className="w-8 h-8 text-gray-400" />}
                     </div>
                     <div>
@@ -180,7 +180,8 @@ const Brands = () => {
                               {v.couleur && <span className="text-gray-500 dark:text-gray-400 text-xs">{v.couleur}</span>}
                             </div>
                             <p className="text-gray-900 dark:text-white font-bold text-sm">
-                              À partir de {v.prix} <span className="text-xs font-normal text-gray-400">FCFA</span>
+<p className="text-gray-400 text-xs">À partir de</p>
+                            <p className="text-gray-900 dark:text-white font-bold text-sm">{v.prix} <span className="text-xs font-normal text-gray-400">FCFA</span></p>
                             </p>
                           </div>
                         </motion.div>

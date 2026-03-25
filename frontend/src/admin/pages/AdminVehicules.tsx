@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Pencil, Trash2, X, Upload, Car, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Upload, Car, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getVehicules, addVehicule, updateVehicule, deleteVehicule, getMarques, uploadImage, type Vehicule, type Marque } from '../../utils/api';
 
 const CARBURANTS = ['Essence', 'Diesel', 'Hybride', 'Électrique', 'GPL'];
@@ -27,6 +27,8 @@ const AdminVehicules = () => {
   const [search, setSearch] = useState('');
   const [filterMarque, setFilterMarque] = useState('');
   const [preview, setPreview] = useState('');
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 8;
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = () => getVehicules().then(setVehicules);
@@ -49,7 +51,7 @@ const AdminVehicules = () => {
   const openEdit = (v: Vehicule) => {
     setEditing(v);
     setForm({ marqueId: v.marqueId, nom: v.nom, prix: v.prix, annee: v.annee, carburant: v.carburant, transmission: v.transmission, couleur: v.couleur || '', description: v.description || '', image: v.image || '', statut: v.statut });
-    setPreview('');
+    setPreview(v.image || '');
     setModal(true);
   };
 
@@ -87,6 +89,9 @@ const AdminVehicules = () => {
     return matchSearch && matchMarque;
   });
 
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   const inputClass = "w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:border-red-500 outline-none transition-all text-sm";
 
   return (
@@ -106,10 +111,10 @@ const AdminVehicules = () => {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
+          <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Rechercher..."
             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-white placeholder-gray-500 focus:border-zinc-600 outline-none text-sm" />
         </div>
-        <select value={filterMarque} onChange={e => setFilterMarque(e.target.value)}
+        <select value={filterMarque} onChange={e => { setFilterMarque(e.target.value); setPage(1); }}
           className="bg-zinc-900 border border-zinc-800 rounded-xl py-2.5 px-4 text-white focus:border-zinc-600 outline-none text-sm appearance-none cursor-pointer">
           <option value="">Toutes les marques</option>
           {marques.map(m => <option key={m.id} value={m.id}>{m.nom}</option>)}
@@ -131,7 +136,7 @@ const AdminVehicules = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
-              {filtered.map((v, i) => {
+              {paginated.map((v, i) => {
                 const marque = marques.find(m => m.id === v.marqueId);
                 return (
                   <motion.tr key={v.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
@@ -187,6 +192,35 @@ const AdminVehicules = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 px-1">
+          <p className="text-gray-500 text-xs">
+            {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} sur {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => setPage(p)}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                  p === page
+                    ? 'bg-red-600 text-white border border-red-600'
+                    : 'bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white'
+                }`}>
+                {p}
+              </button>
+            ))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       <AnimatePresence>
         {modal && (
@@ -217,7 +251,7 @@ const AdminVehicules = () => {
                         <Upload className="w-4 h-4" /> Uploader une photo
                       </button>
                       <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                      <input type="text" value={form.image} onChange={e => { setPreview(''); setForm({ ...form, image: e.target.value }); }}
+                      <input type="text" value={form.image} onChange={e => { setPreview(e.target.value); setForm({ ...form, image: e.target.value }); }}
                         placeholder="ou coller une URL"
                         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-2 px-3 text-white text-sm placeholder-gray-500 focus:border-red-500 outline-none transition-all" />
                     </div>

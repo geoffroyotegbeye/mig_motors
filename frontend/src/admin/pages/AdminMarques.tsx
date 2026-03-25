@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Pencil, Trash2, X, Upload, Tag } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Upload, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getMarques, addMarque, updateMarque, deleteMarque, uploadImage, type Marque } from '../../utils/api';
 
 const TYPES = ['Berlines & SUV', 'Luxe & Premium', 'Deux-roues', 'Camions & Utilitaires', 'Poids lourds & Bus', 'Citadines'];
@@ -15,13 +15,17 @@ const AdminMarques = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState('');
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 12;
+  const totalPages = Math.ceil(marques.length / PER_PAGE);
+  const paginated = marques.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const refresh = () => getMarques().then(setMarques);
 
   useEffect(() => { refresh(); }, []);
 
   const openAdd = () => { setEditing(null); setForm(emptyForm); setPreview(''); setModal(true); };
-  const openEdit = (m: Marque) => { setEditing(m); setForm({ nom: m.nom, logo: m.logo || '', type: m.type, description: m.description || '' }); setPreview(''); setModal(true); };
+  const openEdit = (m: Marque) => { setEditing(m); setForm({ nom: m.nom, logo: m.logo || '', type: m.type, description: m.description || '' }); setPreview(m.logo || ''); setModal(true); };
 
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,13 +69,13 @@ const AdminMarques = () => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {marques.map((m, i) => (
+        {paginated.map((m, i) => (
           <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-700 transition-all">
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center p-2 flex-shrink-0">
                 {m.logo
-                  ? <img src={m.logo} alt={m.nom} className="w-full h-full object-contain filter brightness-0 invert" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  ? <img src={m.logo} alt={m.nom} className="w-full h-full object-contain" onError={e => { e.currentTarget.style.display = 'none'; }} />
                   : <Tag className="w-6 h-6 text-gray-500" />}
               </div>
               <div className="flex gap-2">
@@ -94,6 +98,34 @@ const AdminMarques = () => {
         <div className="text-center py-20 text-gray-500">
           <Tag className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>Aucune marque. Ajoutez-en une !</p>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 px-1">
+          <p className="text-gray-500 text-xs">
+            {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, marques.length)} sur {marques.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => setPage(p)}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                  p === page
+                    ? 'bg-red-600 text-white border border-red-600'
+                    : 'bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white'
+                }`}>
+                {p}
+              </button>
+            ))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-gray-400 hover:border-zinc-600 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -120,7 +152,7 @@ const AdminMarques = () => {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-zinc-800 rounded-xl flex items-center justify-center flex-shrink-0 p-2">
                       {logoDisplay
-                        ? <img src={logoDisplay} alt="logo" className="w-full h-full object-contain filter brightness-0 invert" />
+                        ? <img src={logoDisplay} alt="logo" className="w-full h-full object-contain" />
                         : <Tag className="w-6 h-6 text-gray-500" />}
                     </div>
                     <div className="flex-1">
@@ -129,7 +161,7 @@ const AdminMarques = () => {
                         <Upload className="w-4 h-4" /> Uploader une image
                       </button>
                       <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                      <input type="text" value={form.logo} onChange={e => { setPreview(''); setForm({ ...form, logo: e.target.value }); }}
+                      <input type="text" value={form.logo} onChange={e => { setPreview(e.target.value); setForm({ ...form, logo: e.target.value }); }}
                         placeholder="ou coller une URL"
                         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-2 px-3 text-white text-sm placeholder-gray-500 focus:border-red-500 outline-none transition-all" />
                     </div>

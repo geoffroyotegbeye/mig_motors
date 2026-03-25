@@ -10,7 +10,8 @@ router.post('/', authMiddleware, upload.single('file'), (req: Request, res: Resp
     res.status(400).json({ message: 'Aucun fichier reçu' });
     return;
   }
-  const url = (req.file as any).path;
+  const file = req.file as any;
+  const url = file.secure_url || file.path;
   res.json({ url });
 });
 
